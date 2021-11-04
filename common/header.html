@@ -3,9 +3,265 @@
   const { next } = require("@ember/runloop");
   const siteSettings = api.container.lookup("site-settings:main");
   const discoursePostEventEnabled = siteSettings.discourse_post_event_enabled
+
+  /* Embed calendar
+  ---------------------------------------------------------------- */
+
+  var aeembedcalendar = function(){
+
+    // Variables
+    var loaded = false, lstobj = null;
+
+    return {
+      initialize:function(){
+        // Set
+        loaded = true;
+
+        // PostMessage event listener
+        if(window.addEventListener){
+            window.addEventListener("message", aeembedcalendar.listen, false);
+        } else {
+            window.attachEvent("onmessage", aeembedcalendar.listen);
+        }
+
+        // Remove old instances
+        aeembedcalendar.removeold('ae-emd-cal-frame');
+
+        // Get items
+        var items = document.getElementsByTagName('*');
+
+        // Counter
+        var count = 0;
+        
+        // Loop
+        for(var d=0;d<items.length;d+=1){
+
+          // Has class?
+          if(aeembedcalendar.hasclass(items[d], 'ae-emd-cal')){
+
+            // Add to counter
+            count++;
+
+            // Get calendar reference
+            var cid = items[d].getAttribute('data-calendar');
+            var cid_ls = items[d].getAttribute('data-calendars');
+            var cid_sl = items[d].getAttribute('data-calendars-selected');
+
+            // Get variables (if any)
+            var da1 = items[d].getAttribute('data-configure');
+            var da2 = items[d].getAttribute('data-title');
+            var da3 = items[d].getAttribute('data-title-show');
+            var da4 = items[d].getAttribute('data-today');
+            var da5 = items[d].getAttribute('data-datenav');
+            var da6 = items[d].getAttribute('data-date');
+            var da7 = items[d].getAttribute('data-monthweektoggle');
+            var da8 = items[d].getAttribute('data-subscribebtn');
+            var da9 = items[d].getAttribute('data-swimonth');
+            var da10 = items[d].getAttribute('data-swiweek');
+            var da11 = items[d].getAttribute('data-swischedule');
+            var da12 = items[d].getAttribute('data-timezone');
+            var da13 = items[d].getAttribute('data-logo');
+            var da14 = items[d].getAttribute('data-firstday');
+            var da15 = items[d].getAttribute('data-defaultview');
+            var da16 = items[d].getAttribute('data-datetimeformat');
+            var da17 = items[d].getAttribute('data-print');
+            var dacus = items[d].getAttribute('data-custom-parameters');
+
+            // Parameters variable (for calendar)
+            var par = '';
+
+            // Add parameters
+            if(cid_ls !== 'undefined' && cid_ls !== null){par += '&calendars=' + cid_ls;}
+            if(cid_sl !== 'undefined' && cid_sl !== null){par += '&calendars_sel=' + cid_sl;}
+
+            if(da1 !== 'undefined' && da1 !== null){par += '&config=' + da1;}
+            if(da2 !== 'undefined' && da2 !== null){par += '&title=' + da2;}
+            if(da3 !== 'undefined' && da3 !== null){par += '&titleshow=' + da3;}
+            if(da4 !== 'undefined' && da4 !== null){par += '&today=' + da4;}
+            if(da5 !== 'undefined' && da5 !== null){par += '&datenav=' + da5;}
+            if(da6 !== 'undefined' && da6 !== null){par += '&date=' + da6;}
+            if(da7 !== 'undefined' && da7 !== null){par += '&monthweektoggle=' + da7;}
+            if(da8 !== 'undefined' && da8 !== null){par += '&subscribebtn=' + da8;}
+            if(da9 !== 'undefined' && da9 !== null){par += '&swimonth=' + da9;}
+            if(da10 !== 'undefined' && da10 !== null){par += '&swiweek=' + da10;}
+            if(da11 !== 'undefined' && da11 !== null){par += '&swischedule=' + da11;}
+            if(da12 !== 'undefined' && da12 !== null){par += '&timezone=' + da12;}
+            if(da13 !== 'undefined' && da13 !== null){par += '&logo=' + da13;}
+            if(da14 !== 'undefined' && da14 !== null){par += '&firstday=' + da14;}
+            if(da15 !== 'undefined' && da15 !== null){par += '&defaultview=' + da15;}
+            if(da16 !== 'undefined' && da16 !== null){par += '&datetimeformat=' + da16;}
+            if(da17 !== 'undefined' && da17 !== null){par += '&print=' + da17;}
+            if(dacus !== 'undefined' && dacus !== null){par += '&' + dacus;}
+
+            // Any calendar reference?
+            if(cid !== 'undefined'){
+
+              // Create iframe
+              var elm = document.createElement("iframe");
+
+              // Set attributes
+              elm.setAttribute("id", "ae-embed-calendar-" + cid + count);
+              elm.setAttribute("src", "https://www.addevent.com/calendar/"+cid+"/embed/?id="+cid+par+"#"+cid+count);
+              elm.setAttribute("frameborder", "0");
+              elm.setAttribute("allowtransparency", "true");
+              elm.setAttribute("class", "ae-emd-cal-frame");
+              elm.setAttribute("scrolling", "no");
+
+              // Set styles
+              elm.style.width = "100%";
+              elm.style.height = "500px";
+              elm.style.border = "0px";
+              elm.style.overflow = "hidden";
+              elm.style.visibility = "visible";
+              elm.style.margin = "0px";
+              elm.style.padding = "0px";
+              elm.style.background = "transparent";
+              elm.style.display = "block";
+
+              // Reset
+              items[d].innerHTML = "";
+
+              // Append
+              items[d].appendChild(elm);
+
+            }
+
+          }
+
+        }
+
+        // Attach
+        var aebmdmoxn = setInterval(function(){
+          
+          // Get active element
+          var actelem = document.activeElement;
+
+          // Reset stats in calendar iframe
+            if(actelem && actelem.id.indexOf('ae-embed-calendar') !== -1){
+
+              // Set
+                document.getElementById(actelem.id).setAttribute("data-active", "true");
+
+                // Set
+                lstobj = actelem.id;
+
+            }else{
+
+              // Set
+              if(lstobj && lstobj != null){
+
+                // Set
+                  document.getElementById(lstobj).setAttribute("data-active", "false");
+
+                  // Post
+              var msg = {calendar:lstobj,type:'reset'};
+
+              // Update parent window
+              try{
+
+                // Update
+                document.getElementById(lstobj).contentWindow.postMessage(msg, "*");
+
+              }catch(e){
+
+                // Fail.
+
+              }
+
+              // Reset
+              lstobj = null;
+
+                }
+
+            }
+
+        }, 500);
+      },
+      removeold:function(cls){
+
+        // Element list
+        var list = document.getElementsByClassName(cls);
+        for(var i=list.length-1;0<=i;i--){
+          if(list[i] && list[i].parentElement)
+          list[i].parentElement.removeChild(list[i]);
+        }
+
+      },
+      hasclass:function(e,c){
+
+        // Search + return
+        return new RegExp('(\\s|^)' + c + '(\\s|$)').test(e.className);
+      
+      },
+      ismobile:function(){
+
+        // Test for mobile + tablet
+        var xmob = /iPhone|iPad|iPod|Android|BlackBerry|Opera Mini|WPDesktop|nokia|windows mobile|windows phone|iemobile/i.test(navigator.userAgent);
+        if(xmob){
+        
+          // Return
+          return true;
+
+        }else{
+
+          // Return
+          return false;
+
+        }
+
+      },
+      listen:function(msg){
+
+        // Set callback string
+        var str = '';
+
+        // Data string
+        try{
+
+          // Get value
+          str = msg.data.type.toString();
+
+        }catch(e){
+
+          // Failed or value blank
+
+        }
+
+        // Dimensions
+        if(str == 'dimensions'){
+
+          // Get dimensions from iframe
+          var w = msg.data.w;
+          var h = msg.data.h;
+
+          // Get iframes
+          var frames = document.getElementsByTagName('iframe');
+
+          // Loop to find source match
+          for(var i=0;i<frames.length;i++){
+
+            // Match
+              if(frames[i].contentWindow === msg.source){
+
+                // Update
+                frames[i].style.height = h + "px";
+
+                // Break
+                  break;
+
+              }
+
+          }
+
+        }
+
+      }
+    };
+  }();
     
   api.modifyClass("component:upcoming-events-calendar", {
-    didInsertElement() {
+
+    _renderCalendar() {
       if (window.location.pathname == "/upcoming-events" && discoursePostEventEnabled) {
         const calendar = document.createElement("div")
         calendar.dataset.calendar = settings.upcoming_addevent_calendar_unique_key;
@@ -14,11 +270,10 @@
         calendar.dataset.defaultview = "schedule"
         calendar.classList.add("ae-emd-cal");
         const container = document.querySelector("#upcoming-events-calendar");
+        const iframe = document.createElement("iframe")
         container.append(calendar);
+        aeembedcalendar.initialize();
       }
-      next(() =>
-        loadScript("https://addevent.com/js/cal.embed.t1.init.js")
-      );
     },   
   })
 </script>
