@@ -1,0 +1,24 @@
+<script type="text/discourse-plugin" version="0.8">
+  const  loadScript  = require("discourse/lib/load-script").default;
+  const { next } = require("@ember/runloop");
+  const siteSettings = api.container.lookup("site-settings:main");
+  const discoursePostEventEnabled = siteSettings.discourse_post_event_enabled
+    
+  api.modifyClass("component:upcoming-events-calendar", {
+    didInsertElement() {
+      if (window.location.pathname == "/upcoming-events" && discoursePostEventEnabled) {
+        const calendar = document.createElement("div")
+        calendar.dataset.calendar = settings.upcoming_addevent_calendar_unique_key;
+        calendar.dataset.configure = false;
+        calendar.dataset.print = false;
+        calendar.dataset.defaultview = "schedule"
+        calendar.classList.add("ae-emd-cal");
+        const container = document.querySelector("#upcoming-events-calendar");
+        container.append(calendar);
+      }
+      next(() =>
+        loadScript("https://addevent.com/js/cal.embed.t1.init.js")
+      );
+    },   
+  })
+</script>

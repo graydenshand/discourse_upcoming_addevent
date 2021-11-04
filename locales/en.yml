@@ -1,0 +1,3 @@
+en:
+  theme_metadata:
+    description: "Override the DiscourseEvents upcoming events calendar with an embedded AddEvent calendar"

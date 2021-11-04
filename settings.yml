@@ -1,0 +1,3 @@
+upcoming_addevent_calendar_unique_key:
+  type: string
+  default: ''
