@@ -265,9 +265,10 @@
       if (window.location.pathname == "/upcoming-events" && discoursePostEventEnabled) {
         const calendar = document.createElement("div")
         calendar.dataset.calendar = settings.upcoming_addevent_calendar_unique_key;
-        calendar.dataset.configure = false;
-        calendar.dataset.print = false;
-        calendar.dataset.defaultview = "schedule"
+        calendar.dataset.configure = true;
+        calendar.dataset.print = true;
+        calendar.dataset.defaultview = "month"
+        calendar.dataset.firstday="0"
         calendar.classList.add("ae-emd-cal");
         const container = document.querySelector("#upcoming-events-calendar");
         const iframe = document.createElement("iframe")
